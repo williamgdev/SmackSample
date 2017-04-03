@@ -1,5 +1,7 @@
 package com.github.dev.williamg.smackpoc;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,116 +28,44 @@ import java.io.IOException;
 
 import needle.Needle;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OpenFireServer.OpenFireServerListener{
 
     private static final String HOST_NAME = "192.168.43.212";
     private static final String USER_EMAIL_ADDRESS = "@" + HOST_NAME;
     private static final String XMPP_DOMAIN = "openfire.test";
     private String TAG = "MainActivity ->";
-    AbstractXMPPConnection connection;
-    ChatManager chatManager;
+    private OpenFireServer openFireServer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Needle.onBackgroundThread().withThreadPoolSize(Needle.DEFAULT_POOL_SIZE).execute(new Runnable() {
-            @Override
-            public void run() {
-                connectOpenFireServer();
-            }
-        });
-
+        openFireServer = OpenFireServer.getInstance("USER_ID");
+        openFireServer.setListener(this);
 
     }
 
-
-
-    public void connectOpenFireServer() {
-        //
-        // Create a connection to the jabber.org server.
-//        AbstractXMPPConnection conn1 = null;
-//        try {
-//            conn1 = new XMPPTCPConnection("test", "test123", "openfire.test");
-//        } catch (XmppStringprepException e) {
-//            e.printStackTrace();
-//        }
-//        try {
-//            conn1.connect();
-//        } catch (SmackException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (XMPPException e) {
-//            e.printStackTrace();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-
-// Create a connection to the jabber.org server on a specific port.
-
-        XMPPTCPConnectionConfiguration.Builder configBuilder;
-        try {
-            configBuilder = XMPPTCPConnectionConfiguration.builder();
-            configBuilder.setUsernameAndPassword("test", "test123");
-//            configBuilder.setUsernameAndPassword("admin", "randpass1");
-            configBuilder.setXmppDomain(XMPP_DOMAIN);
-            configBuilder.setHost(HOST_NAME);
-            connection = new XMPPTCPConnection(configBuilder.build());
-            try {
-                connection.connect();
-                connection.login();
-                Log.d(TAG, "Connected: " + connection.isConnected() + " Authenticated: " + connection.isAuthenticated());
-
-                // Assume we've created an XMPPConnection name "connection"._
-                chatManager = ChatManager.getInstanceFor(connection);
-                chatManager.addIncomingListener(new IncomingChatMessageListener() {
-                    @Override
-                    public void newIncomingMessage(EntityBareJid entityBareJid, Message message, Chat chat) {
-                        Log.d(TAG, "newIncomingMessage: " + message.getSubject() + ": " + message.getBody());
-                    }
-                });
-                Log.d(TAG, "connectOpenFireServer: Listener registered");
-
-            } catch (SmackException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (XMPPException e) {
-                e.printStackTrace();
-                Log.d(TAG, "connectOpenFireServer: " + e.getMessage());
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } catch (XmppStringprepException e) {
-            e.printStackTrace();
+    @Override
+    public void notifyStatusOpenFireServer(STATE state, String message) {
+        Log.d(TAG, "notifyStatusOpenFireServer: State:" + state.toString());
+        switch (state) {
+            case ERROR:
+                break;
+            case CONNECTION_CLOSED:
+                break;
+            case RECONNECTION_SUCCESS:
+                break;
+            case RECONNECTION_FAILED:
+                break;
+            case CONNECTED:
+                break;
         }
-
-
-
     }
 
-    public void onLogin(View view) {
-        Message message = new Message();
-        message.setBody("What's uppp!!!");
-        message.setSubject("Ey there");
-        EntityBareJid jid = null;
-        try {
-            jid = JidCreate.entityBareFrom("admin" + "@openfire.test/auisczr9pv");
-
-            Chat chat = chatManager.chatWith(jid);
-            try {
-                chat.send(message);
-                Log.d(TAG, "onLogin: " + connection.getUser());
-            } catch (SmackException.NotConnectedException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } catch (XmppStringprepException e) {
-            e.printStackTrace();
-        }
+    @Override
+    public void notifyMessage(final String subject, final String body) {
+        Log.d(TAG, "processMessage: " + subject + ": " + body);
 
     }
 }
