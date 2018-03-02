@@ -2,8 +2,8 @@ package com.github.dev.williamg.smackpoc;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -30,9 +30,9 @@ import needle.Needle;
 
 public class MainActivity extends AppCompatActivity implements OpenFireServer.OpenFireServerListener{
 
-    private static final String HOST_NAME = "192.168.43.212";
+    private static final String HOST_NAME = "ec2-54-234-60-142.compute-1.amazonaws.com";
     private static final String USER_EMAIL_ADDRESS = "@" + HOST_NAME;
-    private static final String XMPP_DOMAIN = "openfire.test";
+    private static final String XMPP_DOMAIN = "ec2-54-234-60-142.compute-1.amazonaws.com";
     private String TAG = "MainActivity ->";
     private OpenFireServer openFireServer;
 
@@ -41,16 +41,16 @@ public class MainActivity extends AppCompatActivity implements OpenFireServer.Op
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        openFireServer = OpenFireServer.getInstance("USER_ID");
-        openFireServer.setListener(this);
 
     }
 
     @Override
-    public void notifyStatusOpenFireServer(STATE state, String message) {
+    public void notifyStatusOpenFireServer(STATE state, final String message) {
         Log.d(TAG, "notifyStatusOpenFireServer: State:" + state.toString());
         switch (state) {
             case ERROR:
+            case AUTHENTICATED:
+                showMessage(message);
                 break;
             case CONNECTION_CLOSED:
                 break;
@@ -63,9 +63,28 @@ public class MainActivity extends AppCompatActivity implements OpenFireServer.Op
         }
     }
 
+    private void showMessage(final String message) {
+        Needle.onMainThread().execute(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), message,Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     @Override
     public void notifyMessage(final String subject, final String body) {
+        showMessage(body);
         Log.d(TAG, "processMessage: " + subject + ": " + body);
 
+    }
+
+    public void onLogin(View view) {
+        openFireServer = OpenFireServer.getInstance("pepe");
+        openFireServer.setListener(this);
+    }
+
+    public void SendMessage(View view) {
+        openFireServer.sendPrivateMessage("yendry", "Probando", "Ey Ey I'm here");
     }
 }

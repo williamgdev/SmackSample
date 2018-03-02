@@ -1,1 +1,1 @@
-include ':app', ':smack-core-4.2.0', ':smack-tcp-4.2.0', ':jxmpp-core-0.5.0', ':jxmpp-jid-0.5.0', ':jxmpp-util-cache-0.5.0', ':smack-resolver-dnsjava-4.2.0', ':smack-sasl-javax-4.2.0', ':smack-android-4.2.0', ':smack-android-extensions-4.2.0', ':smack-extensions-4.2.0', ':smack-im-4.2.0', ':smack-resolver-javax-4.2.0'
+include ':app'

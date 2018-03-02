@@ -1,2 +1,0 @@
-configurations.maybeCreate("default")
-artifacts.add("default", file('jxmpp-util-cache-0.5.0.jar'))

@@ -1,11 +1,16 @@
 package com.github.dev.williamg.smackpoc;
 
+import android.util.Log;
+
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.chat.Chat;
+import org.jivesoftware.smack.chat.ChatManager;
+import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
@@ -14,6 +19,8 @@ import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.MultiUserChatException;
 import org.jivesoftware.smackx.muc.MultiUserChatManager;
 import org.jxmpp.jid.DomainBareJid;
+import org.jxmpp.jid.Jid;
+import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
 
 import java.io.IOException;
@@ -55,9 +62,9 @@ public class OpenFireServer implements ConnectionListener {
             /**
              * Notice that the user and password are the same
              */
-            configBuilder.setUsernameAndPassword(uniqueUID, uniqueUID);
-            configBuilder.setXmppDomain("XMPP_DOMAIN");
-            configBuilder.setHost("HOST_NAME");
+            configBuilder.setUsernameAndPassword(uniqueUID, "p");
+            configBuilder.setXmppDomain("54.234.60.142");
+            configBuilder.setHost("54.234.60.142");
             connection = new XMPPTCPConnection(configBuilder.build());
             connection.addConnectionListener(this);
 
@@ -84,6 +91,22 @@ public class OpenFireServer implements ConnectionListener {
         }
     }
 
+    public void sendPrivateMessage(String user, String subject, String body) {
+        try {
+            Jid jid = JidCreate.from("yendry@172.31.83.0");
+            Chat chat = ChatManager.getInstanceFor(connection)
+                    .createChat(jid.asEntityJidIfPossible());
+            chat.sendMessage(body);
+            chat.addMessageListener(new ChatMessageListener() {
+                @Override
+                public void processMessage(Chat chat, Message message) {
+                    listener.notifyMessage(message.getBody(), message.getBody());
+                }
+            });
+        } catch (Exception e) {
+            listener.notifyStatusOpenFireServer(OpenFireServerListener.STATE.ERROR, e.getMessage());
+        }
+    }
 
     public void sendMessage(String subject, String body) {
         if (!isAuthenticated()) {
@@ -164,7 +187,7 @@ public class OpenFireServer implements ConnectionListener {
                 });
             }
 
-            listener.notifyStatusOpenFireServer(OpenFireServerListener.STATE.AUTHENTICATED, "");
+            listener.notifyStatusOpenFireServer(OpenFireServerListener.STATE.AUTHENTICATED, "AUTHENTICATED");
             return;
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -179,6 +202,7 @@ public class OpenFireServer implements ConnectionListener {
         }
 
         listener.notifyStatusOpenFireServer(OpenFireServerListener.STATE.ERROR, "Error authenticating");
+
     }
 
     @Override
@@ -209,6 +233,7 @@ public class OpenFireServer implements ConnectionListener {
         listener.notifyStatusOpenFireServer(OpenFireServerListener.STATE.RECONNECTION_FAILED,("Reconnection Failed"));
 
     }
+
 
     public interface OpenFireServerListener{
         enum STATE {ERROR, CONNECTION_CLOSED, RECONNECTION_SUCCESS, RECONNECTION_FAILED, AUTHENTICATED, CONNECTED};

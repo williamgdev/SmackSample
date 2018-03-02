@@ -9,18 +9,6 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/jxmpp-core-0.5.0" />
-            <option value="$PROJECT_DIR$/jxmpp-jid-0.5.0" />
-            <option value="$PROJECT_DIR$/jxmpp-util-cache-0.5.0" />
-            <option value="$PROJECT_DIR$/smack-android-4.2.0" />
-            <option value="$PROJECT_DIR$/smack-android-extensions-4.2.0" />
-            <option value="$PROJECT_DIR$/smack-core-4.2.0" />
-            <option value="$PROJECT_DIR$/smack-extensions-4.2.0" />
-            <option value="$PROJECT_DIR$/smack-im-4.2.0" />
-            <option value="$PROJECT_DIR$/smack-resolver-dnsjava-4.2.0" />
-            <option value="$PROJECT_DIR$/smack-resolver-javax-4.2.0" />
-            <option value="$PROJECT_DIR$/smack-sasl-javax-4.2.0" />
-            <option value="$PROJECT_DIR$/smack-tcp-4.2.0" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
